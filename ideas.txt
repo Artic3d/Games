@@ -1,0 +1,5 @@
+
+homepage
+
+2048
+    global leaderboard

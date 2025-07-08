@@ -1,0 +1,80 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #faf8ef;
+  color: #333;
+  padding: 2rem;
+  margin: 0;
+  text-align: center; /* voor h1 en score centreren */
+}
+
+h1 {
+  margin-bottom: 1rem;
+  font-size: 3rem;
+}
+
+#score {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.game-area {
+  position: relative;
+  width: 600px; /* breedte canvas */
+  margin: 0 auto; /* canvas horizontaal centreren */
+}
+
+#gameCanvas {
+  border: 5px solid #bbada0;
+  background: #bbada0;
+  display: block;
+  margin: 0 auto; /* canvas zelf ook centreren binnen game-area */
+}
+
+.side-panel {
+  position: absolute;
+  top: 50px;
+  left: 630px; 
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#highScore {
+  font-size: 1.2rem;
+  background: #eee4da;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  min-width: 120px;
+}
+
+#restartButton {
+  padding: 10px 20px;
+  background: #8f7a66;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#restartButton:hover {
+  background: #a67c52;
+}
+
+#homeButton {
+  margin-top: 30px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  background-color: #776e65;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+#homeButton:hover {
+  background-color: #8f7a66;
+}

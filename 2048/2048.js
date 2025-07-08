@@ -4,9 +4,9 @@ const size = 4;
 const tileSize = canvas.width / size;
 let board = [];
 let score = 0;
+let highScore = localStorage.getItem("highScore") || 0;
 let gameOver = false;
 
-// Kleuren per tegelwaarde
 const tileColors = {
   0: "#cdc1b4",
   2: "#eee4da",
@@ -22,7 +22,6 @@ const tileColors = {
   2048: "#edc22e"
 };
 
-// Initialiseer leeg bord
 function initBoard() {
   board = [];
   for (let i = 0; i < size; i++) {
@@ -39,7 +38,6 @@ function initBoard() {
   updateScore();
 }
 
-// Voeg een nieuwe tegel (2 of 4) toe op een lege plek
 function addTile() {
   let empty = [];
   for (let i = 0; i < size; i++) {
@@ -54,9 +52,10 @@ function addTile() {
   board[spot.x][spot.y] = Math.random() < 0.9 ? 2 : 4;
 }
 
-// Teken het bord
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawGridLines();
+
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
       drawTile(i, j, board[i][j]);
@@ -73,7 +72,25 @@ function draw() {
   }
 }
 
-// Teken 1 tegel met kleur en waarde
+function drawGridLines() {
+  ctx.strokeStyle = "#bbada0";
+  ctx.lineWidth = 5;
+  for (let i = 0; i <= size; i++) {
+    const x = i * tileSize;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+  for (let i = 0; i <= size; i++) {
+    const y = i * tileSize;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+}
+
 function drawTile(row, col, value) {
   ctx.fillStyle = tileColors[value] || "#3c3a32";
   ctx.fillRect(col * tileSize + 5, row * tileSize + 5, tileSize - 10, tileSize - 10);
@@ -86,11 +103,11 @@ function drawTile(row, col, value) {
   }
 }
 
-// Verplaats tegels in een richting
 function move(dir) {
   if (gameOver) return;
 
   let flipped = false, rotated = false, moved = false;
+
   if (dir === "up") {
     board = rotateLeft(board);
     rotated = true;
@@ -124,11 +141,11 @@ function move(dir) {
     if (isGameOver()) {
       gameOver = true;
       draw();
+      checkHighScore();
     }
   }
 }
 
-// Verplaats en combineer rijen
 function slide(row) {
   row = row.filter(val => val);
   for (let i = 0; i < row.length - 1; i++) {
@@ -143,7 +160,6 @@ function slide(row) {
   return row;
 }
 
-// Hulpfuncties: roteer en flip
 function rotateLeft(mat) {
   let res = [];
   for (let i = 0; i < size; i++) {
@@ -170,7 +186,6 @@ function flip(mat) {
   return mat.map(row => row.reverse());
 }
 
-// Check of er nog bewegingen mogelijk zijn
 function isGameOver() {
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
@@ -182,12 +197,20 @@ function isGameOver() {
   return true;
 }
 
-// Update score op pagina
 function updateScore() {
   document.getElementById("score").textContent = "Score: " + score;
 }
 
-// Luister naar toetsen
+function checkHighScore() {
+  if (score > highScore) {
+    highScore = score;
+    document.getElementById("highScore").textContent = "Highscore: " + highScore;
+    localStorage.setItem("highScore", highScore);
+  }
+}
+
+document.getElementById("restartButton").addEventListener("click", initBoard);
+
 window.addEventListener("keydown", e => {
   if (e.key === "ArrowUp") move("up");
   if (e.key === "ArrowDown") move("down");
@@ -195,5 +218,31 @@ window.addEventListener("keydown", e => {
   if (e.key === "ArrowRight") move("right");
 });
 
-// Start het spel
+document.getElementById("highScore").textContent = "Highscore: " + highScore;
 initBoard();
+
+
+let touchStartX = 0;
+let touchStartY = 0;
+
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }
+});
+
+canvas.addEventListener("touchend", (e) => {
+  let dx = e.changedTouches[0].clientX - touchStartX;
+  let dy = e.changedTouches[0].clientY - touchStartY;
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    // horizontal swipe
+    if (dx > 30) move("right");
+    else if (dx < -30) move("left");
+  } else {
+    // vertical swipe
+    if (dy > 30) move("down");
+    else if (dy < -30) move("up");
+  }
+});
