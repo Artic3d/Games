@@ -1,7 +1,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const size = 4;
-const tileSize = canvas.width / size;
+let tileSize;
 let board = [];
 let score = 0;
 let highScore = localStorage.getItem("highScore") || 0;
@@ -21,6 +21,16 @@ const tileColors = {
   1024: "#edc53f",
   2048: "#edc22e"
 };
+
+function resizeCanvas() {
+  // Maak canvas responsive
+  let dimension = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+  if (dimension > 600) dimension = 600; // Max grootte op desktop
+  canvas.width = dimension;
+  canvas.height = dimension;
+  tileSize = canvas.width / size;
+  draw(); // Teken opnieuw bij resize
+}
 
 function initBoard() {
   board = [];
@@ -54,8 +64,8 @@ function addTile() {
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawGridLines();
 
+  // Teken tegels
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
       drawTile(i, j, board[i][j]);
@@ -66,28 +76,9 @@ function draw() {
     ctx.fillStyle = "rgba(238, 228, 218, 0.8)";
     ctx.fillRect(0, canvas.height / 2 - 50, canvas.width, 100);
     ctx.fillStyle = "#776e65";
-    ctx.font = "40px Arial";
+    ctx.font = `${canvas.width / 12}px Arial`;
     ctx.textAlign = "center";
     ctx.fillText("Game Over!", canvas.width / 2, canvas.height / 2);
-  }
-}
-
-function drawGridLines() {
-  ctx.strokeStyle = "#bbada0";
-  ctx.lineWidth = 5;
-  for (let i = 0; i <= size; i++) {
-    const x = i * tileSize;
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, canvas.height);
-    ctx.stroke();
-  }
-  for (let i = 0; i <= size; i++) {
-    const y = i * tileSize;
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(canvas.width, y);
-    ctx.stroke();
   }
 }
 
@@ -96,7 +87,7 @@ function drawTile(row, col, value) {
   ctx.fillRect(col * tileSize + 5, row * tileSize + 5, tileSize - 10, tileSize - 10);
   if (value) {
     ctx.fillStyle = value <= 4 ? "#776e65" : "#f9f6f2";
-    ctx.font = "bold 30px Arial";
+    ctx.font = `bold ${tileSize / 2.5}px Arial`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(value, col * tileSize + tileSize / 2, row * tileSize + tileSize / 2);
@@ -209,6 +200,7 @@ function checkHighScore() {
   }
 }
 
+// Knoppen en swipes
 document.getElementById("restartButton").addEventListener("click", initBoard);
 
 window.addEventListener("keydown", e => {
@@ -218,31 +210,28 @@ window.addEventListener("keydown", e => {
   if (e.key === "ArrowRight") move("right");
 });
 
-document.getElementById("highScore").textContent = "Highscore: " + highScore;
-initBoard();
-
-
-let touchStartX = 0;
-let touchStartY = 0;
-
-canvas.addEventListener("touchstart", (e) => {
-  if (e.touches.length === 1) {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-  }
+// Swipe detectie voor mobiel
+let touchStartX = 0, touchStartY = 0;
+canvas.addEventListener("touchstart", e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
 });
 
-canvas.addEventListener("touchend", (e) => {
-  let dx = e.changedTouches[0].clientX - touchStartX;
-  let dy = e.changedTouches[0].clientY - touchStartY;
+canvas.addEventListener("touchend", e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
 
   if (Math.abs(dx) > Math.abs(dy)) {
-    // horizontal swipe
     if (dx > 30) move("right");
     else if (dx < -30) move("left");
   } else {
-    // vertical swipe
     if (dy > 30) move("down");
     else if (dy < -30) move("up");
   }
 });
+
+// Initialiseren
+document.getElementById("highScore").textContent = "Highscore: " + highScore;
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+initBoard();

@@ -1,80 +1,79 @@
 body {
+  margin: 0;
   font-family: Arial, sans-serif;
   background: #faf8ef;
   color: #333;
-  padding: 2rem;
-  margin: 0;
-  text-align: center; /* voor h1 en score centreren */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
 }
 
 h1 {
   margin-bottom: 1rem;
-  font-size: 3rem;
 }
 
-#score {
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
+#score, #highScore {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
 }
 
 .game-area {
-  position: relative;
-  width: 600px; /* breedte canvas */
-  margin: 0 auto; /* canvas horizontaal centreren */
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1rem;
 }
 
-#gameCanvas {
-  border: 5px solid #bbada0;
+canvas {
+  max-width: 90vw; /* Schaal canvas op kleine schermen */
+  max-height: 90vw; /* Houd vierkant */
+  width: 600px;     /* Desktop grootte */
+  height: 600px;
   background: #bbada0;
   display: block;
-  margin: 0 auto; /* canvas zelf ook centreren binnen game-area */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .side-panel {
-  position: absolute;
-  top: 50px;
-  left: 630px; 
-  width: 150px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  justify-content: flex-end; /* Highscore & restart onderaan */
+  align-items: flex-end;     /* Rechts uitlijnen */
 }
 
-#highScore {
-  font-size: 1.2rem;
-  background: #eee4da;
-  padding: 10px;
-  border-radius: 5px;
-  text-align: center;
-  min-width: 120px;
-}
-
-#restartButton {
-  padding: 10px 20px;
+#restartButton, #homeButton {
+  padding: 0.5rem 1rem;
   background: #8f7a66;
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 5px;
+  margin-top: 0.5rem;
   cursor: pointer;
-  font-weight: bold;
 }
 
-#restartButton:hover {
-  background: #a67c52;
+#restartButton:hover, #homeButton:hover {
+  background: #776e65;
 }
 
-#homeButton {
-  margin-top: 30px;
-  padding: 10px 20px;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 5px;
-  border: none;
-  background-color: #776e65;
-  color: white;
-  transition: background-color 0.3s ease;
-}
+@media (max-width: 768px) {
+  .game-area {
+    flex-direction: column; /* Op mobiel onder elkaar */
+    align-items: center;
+  }
 
-#homeButton:hover {
-  background-color: #8f7a66;
+  .side-panel {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  canvas {
+    max-width: 90vw;
+    max-height: 90vw;
+    width: auto;
+    height: auto;
+  }
 }
