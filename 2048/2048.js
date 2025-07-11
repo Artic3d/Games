@@ -23,13 +23,15 @@ const tileColors = {
 };
 
 function resizeCanvas() {
-  // Maak canvas responsive
   let dimension = Math.min(window.innerWidth, window.innerHeight) * 0.9;
-  if (dimension > 600) dimension = 600; // Max grootte op desktop
+  if (dimension > 600) dimension = 600; // Max size
   canvas.width = dimension;
   canvas.height = dimension;
   tileSize = canvas.width / size;
-  draw(); // Teken opnieuw bij resize
+
+  if (board.flat().some(val => val)) { // Only redraw if board has tiles
+    draw();
+  }
 }
 
 function initBoard() {
@@ -211,13 +213,14 @@ window.addEventListener("keydown", e => {
 });
 
 // Swipe detectie voor mobiel
-let touchStartX = 0, touchStartY = 0;
 canvas.addEventListener("touchstart", e => {
+  e.preventDefault(); // 🚫 Prevent scrolling
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
-});
+}, { passive: false }); // 👈 important to allow preventDefault
 
 canvas.addEventListener("touchend", e => {
+  e.preventDefault(); // 🚫 Prevent scrolling
   const dx = e.changedTouches[0].clientX - touchStartX;
   const dy = e.changedTouches[0].clientY - touchStartY;
 
@@ -228,10 +231,12 @@ canvas.addEventListener("touchend", e => {
     if (dy > 30) move("down");
     else if (dy < -30) move("up");
   }
-});
+}, { passive: false });
 
 // Initialiseren
 document.getElementById("highScore").textContent = "Highscore: " + highScore;
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 initBoard();
+
+
